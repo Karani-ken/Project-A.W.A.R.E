@@ -33,4 +33,27 @@ function getChannel(){
     return channel;
 }
 
-export { connect, getChannel };
+async function setUpQueues(channel){
+    const DLX = 'dlx.task_queue';
+    const DLQ = 'task_queue.dlq';
+    const MAIN_QUEUE = 'task_queue';
+
+    //1. Create the dead-letter exchange (fanout is simplest - just routes to DLQ)
+    await channel.assertExchange(DLX, 'fanout', {durable: true});
+
+    //2. Create a dead-letter queue and bind it to the DLX
+    await channel.assertQueue(DLQ, {durable: true});
+    await channel.bindQueue(DLQ, DLX, '');
+
+    //3. CREATE THE MAIN queue, telling it to dead-letter into DLX on rejection
+    await channel.assertQueue(MAIN_QUEUE, {
+        durable: true,
+        arguments: {
+            'a-dead-letter-exchange': DLX,
+        },
+    });
+
+    return {MAIN_QUEUE, DLQ, DLX}
+}
+
+export { connect, getChannel, setUpQueues };

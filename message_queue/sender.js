@@ -1,23 +1,17 @@
-import {connect, getChannel} from './mq.js'
+import {connect, getChannel, setUpQueues} from './mq.js'
 
-async function sendMessage(queue, message) {
+async function sendMessage(message) {
     await connect(); //waits for connection and channel to be established
     const channel = await getChannel();
-
-    //derable: true means the queue survives a RabbitMQ restart
-    await channel.assertQueue(queue, {durable: true})
+    const { MAIN_QUEUE } = await setUpQueues(channel);
     
-    channel.sendToQueue(queue, Buffer.from(message),{persistent: true})
+    channel.sendToQueue(MAIN_QUEUE, Buffer.from(message),{persistent: true})
     console.log(`[x] Sent: ${message}`);
 
-    //give it a moment to flush before closing
-    setTimeout(() => {
-        process.exit(0)
-    }, 500)
+  setTimeout(() => process.exit(0), 500)
 
 }
 
-const queue = 'task_queue';
-const message = 'Hello, RabbitMQ!'
-
-sendMessage(queue, message).catch(console.error)
+// allow passing a custom message from the command line
+const arg = process.argv[2];
+sendMessage(arg || 'Hello, RabbitMQ!').catch(console.error);
