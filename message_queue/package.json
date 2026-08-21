@@ -11,6 +11,11 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
-    "amqplib": "^2.0.1"
+    "amqplib": "^2.0.1",
+    "crypto": "^1.0.1",
+    "pino": "^10.3.1"
+  },
+  "devDependencies": {
+    "pino-pretty": "^13.1.3"
   }
 }

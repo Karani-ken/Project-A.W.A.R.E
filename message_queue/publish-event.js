@@ -1,5 +1,5 @@
 import { connect, getChannel, setTopicExchange, bindTopicQueues } from "./mq.js";
-
+import { randomUUID } from "crypto";
 async function publishEvent(routingKey, payload) {
     await connect();
     const channel = await getChannel();
@@ -7,7 +7,8 @@ async function publishEvent(routingKey, payload) {
 
     await bindTopicQueues(channel, EXCHANGE);// ensure queue exists before publishing
     channel.publish(EXCHANGE, routingKey, Buffer.from(JSON.stringify(payload)),{
-        persistent: true
+        persistent: true,
+        messageId: randomUUID(),
     });
 
     console.log(`[x] Published "${routingKey}":`, payload);
