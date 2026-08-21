@@ -1,0 +1,12 @@
+{
+  "name": "auth-service",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "migrate": "node db/migrate.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "pg": "^8.11.0"
+  }
+}
